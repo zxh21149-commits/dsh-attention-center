@@ -1,0 +1,78 @@
+{
+  "name": "dsh-attention-center",
+  "version": "0.3.0",
+  "type": "module",
+  "description": "PTC 增强套件（注意力中心 + 刨根问底）：跑在 run_code/SDK 上的 PTC 预设、跨会话答题与失败提醒、与 dsh-ops 取证工具对齐。PTC suite for DeepSeek Harness: inquiry preset on run_code, attention center, ops pairing.",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./inquiry": "./inquiry/index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib",
+    "inquiry",
+    "locale",
+    "icon.svg",
+    "cordis.patch.yml",
+    "docs",
+    "README.md",
+    "README.en.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "ptc",
+    "run-code",
+    "attention",
+    "notification",
+    "questions",
+    "inquiry",
+    "ops"
+  ],
+  "engines": {
+    "node": ">=22",
+    "dsh": ">=0.2.0-0"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "^3.18.5",
+    "zod": "^4.4.3"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-api-session-controller",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-client-ui-session",
+        "@deepseek-ai/dsh-client-ui-workspace"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "author": "zxh21149-commits",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zxh21149-commits/dsh-attention-center.git"
+  },
+  "homepage": "https://github.com/zxh21149-commits/dsh-attention-center#readme",
+  "bugs": {
+    "url": "https://github.com/zxh21149-commits/dsh-attention-center/issues"
+  }
+}

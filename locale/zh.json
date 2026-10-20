@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "注意力中心 · Attention Center",
+    "description": "在 DSH 内显示运行中会话数；任务失败、跨对话待答问题会弹窗提醒，可就地作答，切到其他软件不打扰。"
+  }
+}

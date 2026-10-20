@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Attention Center",
+    "description": "Shows how many sessions are running, and pops in-DSH notices for failed turns and cross-session pending questions (answerable in place). Silent when you are in another app."
+  }
+}

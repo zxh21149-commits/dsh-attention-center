@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "language": "en",
+  "notes": "Pick by seed type; skip what you can infer or inspect, and mark those as [My inference].",
+  "dimensions": [
+    {
+      "id": "why",
+      "title": "A. Why",
+      "questions": [
+        {
+          "text": "When does this get used?",
+          "options": ["Every day", "Every week", "Only for one project", "Occasionally"]
+        },
+        {
+          "text": "How do you do it today, and which step is the most painful?"
+        },
+        {
+          "text": "What happens if it never gets built?",
+          "options": ["Nice to have", "Blocks real work", "Both"]
+        },
+        {
+          "text": "What have you tried before, and why did you stop?"
+        }
+      ]
+    },
+    {
+      "id": "who",
+      "title": "B. Who",
+      "questions": [
+        {
+          "text": "Just you, or other people too? How many?",
+          "options": ["Just me", "2-3 people", "A small team", "Many"]
+        },
+        {
+          "text": "How technical are the users?",
+          "options": ["Not technical", "Comfortable with apps", "Can code"]
+        },
+        {
+          "text": "Where will it run?",
+          "options": ["Windows desktop", "Phone", "Tablet", "Browser"]
+        },
+        {
+          "text": "Who maintains it after v1?"
+        }
+      ]
+    },
+    {
+      "id": "what",
+      "title": "C. What",
+      "questions": [
+        {
+          "text": "What form should the deliverable take?",
+          "options": ["Web page", "Desktop app", "Browser extension", "Script", "Document"]
+        },
+        {
+          "text": "What should the user see first? Name one product with a similar feel."
+        },
+        {
+          "text": "What is the first action a user takes? And the second?"
+        },
+        {
+          "text": "Where does the input come from?",
+          "options": ["Typed in", "Imported file", "Web scraping", "Database"]
+        },
+        {
+          "text": "Where should the output go?",
+          "options": ["On screen", "A file", "A message", "A database"]
+        },
+        {
+          "text": "If only one feature could survive, which one?"
+        }
+      ]
+    },
+    {
+      "id": "boundaries",
+      "title": "D. Boundaries",
+      "questions": [
+        {
+          "text": "What is explicitly out of scope for v1?",
+          "options": ["Login", "Multi-user", "Cloud sync"],
+          "multiSelect": true
+        },
+        {
+          "text": "What must stay compatible (file formats, old data, another tool)?"
+        },
+        {
+          "text": "What must never be touched (files, accounts, production)?"
+        },
+        {
+          "text": "What scale is enough (rows, users, file size)?"
+        }
+      ]
+    },
+    {
+      "id": "success",
+      "title": "E. Success",
+      "questions": [
+        {
+          "text": "How will you test it? Walk through the clicks."
+        },
+        {
+          "text": "What makes you say \"this version works\"?"
+        },
+        {
+          "text": "What makes you say \"this version is good\"?"
+        },
+        {
+          "text": "What would make you abandon it?"
+        },
+        {
+          "text": "When do you want the first version?",
+          "options": ["Tonight", "This week", "No rush"]
+        }
+      ]
+    },
+    {
+      "id": "constraints",
+      "title": "F. Constraints",
+      "questions": [
+        {
+          "text": "Any required stack, or should I choose?"
+        },
+        {
+          "text": "Where does it run, and do you have admin rights there?"
+        },
+        {
+          "text": "Any login, API key, or data that must stay on this machine?"
+        },
+        {
+          "text": "Any budget for paid services?"
+        }
+      ]
+    }
+  ]
+}
