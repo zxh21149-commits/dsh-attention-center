@@ -29,6 +29,7 @@ window.__ModuleLoader__.load({
         'error.open': 'Open',
         'error.retry': 'Retry',
         'error.dismiss': 'Dismiss',
+        'error.copy': 'Copy',
         'done.title': 'Session finished',
         'done.open': 'Open result',
         'done.dismiss': 'Got it',
@@ -69,6 +70,7 @@ window.__ModuleLoader__.load({
         'error.open': '打开',
         'error.retry': '重试',
         'error.dismiss': '忽略',
+        'error.copy': '复制',
         'done.title': '会话完成',
         'done.open': '看结果',
         'done.dismiss': '知道了',
@@ -238,30 +240,30 @@ window.__ModuleLoader__.load({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'flex-end',
-        gap: 8,
+        gap: 10,
         maxWidth: 'calc(100vw - 32px)',
         pointerEvents: 'none',
       },
       bubble: {
         display: 'flex',
         alignItems: 'center',
-        gap: 8,
-        padding: '7px 11px',
+        gap: 7,
+        padding: '7px 12px',
         borderRadius: 999,
-        border: '1px solid var(--dsw-alias-border-l1, #374151)',
-        background: 'var(--dsw-alias-bg-overlay, #111827)',
-        color: 'var(--dsw-alias-label-primary, #f9fafb)',
-        boxShadow: '0 6px 20px rgba(0,0,0,.24)',
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: 'var(--dsw-alias-bg-overlay)',
+        color: 'var(--dsw-alias-label-primary)',
+        boxShadow: '0 6px 18px rgba(0,0,0,.18)',
         fontSize: 12,
         pointerEvents: 'auto',
         userSelect: 'none',
         cursor: 'pointer',
       },
       bubbleButton: { border: 0, background: 'transparent', color: 'inherit', cursor: 'pointer', fontSize: 12, padding: 0 },
-      badgeWaiting: { color: 'var(--dsw-alias-state-warn-primary, #f59e0b)', fontWeight: 600 },
-      badgeError: { color: 'var(--dsw-alias-state-error-primary, #f87171)', fontWeight: 600 },
-      badgeDone: { color: 'var(--dsw-alias-state-success-primary, #34d399)', fontWeight: 600 },
-      badgeCountdown: { color: 'var(--dsw-alias-label-secondary, #9ca3af)', fontSize: 11 },
+      badgeWaiting: { color: 'var(--dsw-alias-state-warn-primary)', fontWeight: 600 },
+      badgeError: { color: 'var(--dsw-alias-state-error-primary)', fontWeight: 600 },
+      badgeDone: { color: 'var(--dsw-alias-state-success-primary)', fontWeight: 600 },
+      badgeCountdown: { color: 'var(--dsw-alias-label-secondary)', fontSize: 11, fontVariantNumeric: 'tabular-nums' },
       pick: { marginBottom: 4, wordBreak: 'break-word' },
       runningList: {
         width: 300,
@@ -271,13 +273,14 @@ window.__ModuleLoader__.load({
         maxHeight: 240,
         overflowY: 'auto',
         padding: 8,
-        borderRadius: 10,
-        border: '1px solid var(--dsw-alias-border-l1, #374151)',
-        background: 'var(--dsw-alias-bg-overlay, #111827)',
-        color: 'var(--dsw-alias-label-primary, #f9fafb)',
-        boxShadow: '0 10px 28px rgba(0,0,0,.28)',
+        borderRadius: 12,
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: 'var(--dsw-alias-bg-overlay)',
+        color: 'var(--dsw-alias-label-primary)',
+        boxShadow: '0 10px 28px rgba(0,0,0,.18)',
         fontSize: 12,
         pointerEvents: 'auto',
+        animation: 'attn-fade 120ms ease-out',
       },
       row: {
         display: 'block',
@@ -286,8 +289,8 @@ window.__ModuleLoader__.load({
         border: 0,
         background: 'transparent',
         color: 'inherit',
-        padding: '5px 6px',
-        borderRadius: 6,
+        padding: '6px 8px',
+        borderRadius: 8,
         cursor: 'pointer',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -295,56 +298,91 @@ window.__ModuleLoader__.load({
         fontSize: 12,
       },
       toastStack: {
-        width: 360,
+        width: 340,
         maxWidth: 'calc(100vw - 32px)',
         maxHeight: '46vh',
         minHeight: 0,
         overflowY: 'auto',
         display: 'flex',
         flexDirection: 'column',
-        gap: 8,
+        gap: 10,
         pointerEvents: 'none',
       },
       card: {
-        padding: 12,
+        position: 'relative',
+        padding: '12px 14px',
         borderRadius: 12,
-        border: '1px solid var(--dsw-alias-border-l1, #374151)',
-        background: 'var(--dsw-alias-bg-overlay, #111827)',
-        color: 'var(--dsw-alias-label-primary, #f9fafb)',
-        boxShadow: '0 14px 34px rgba(0,0,0,.32)',
+        border: '1px solid var(--dsw-alias-border-l1)',
+        borderLeft: '3px solid var(--dsw-alias-border-l1)',
+        background: 'var(--dsw-alias-bg-overlay)',
+        color: 'var(--dsw-alias-label-primary)',
+        boxShadow: '0 10px 28px rgba(0,0,0,.18)',
         pointerEvents: 'auto',
-        fontSize: 12,
-        lineHeight: 1.5,
+        fontSize: 13,
+        lineHeight: 1.6,
       },
-      titleRow: { display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 6 },
-      title: { fontWeight: 600, fontSize: 13 },
-      muted: { color: 'var(--dsw-alias-label-secondary, #9ca3af)' },
-      session: { color: 'var(--dsw-alias-label-secondary, #9ca3af)', fontSize: 11, marginBottom: 6 },
+      cardError: { borderLeftColor: 'var(--dsw-alias-state-error-primary)' },
+      cardDone: { borderLeftColor: 'var(--dsw-alias-state-success-primary)' },
+      cardAuto: { borderLeftColor: 'var(--dsw-alias-state-warn-primary)' },
+      cardIcon: { fontSize: 13, marginRight: 2 },
+      titleRow: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 },
+      title: { fontWeight: 600, fontSize: 14, letterSpacing: 0 },
+      muted: { color: 'var(--dsw-alias-label-secondary)', fontSize: 11 },
+      sessionPill: {
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 4,
+        maxWidth: '100%',
+        padding: '1px 8px',
+        borderRadius: 999,
+        background: 'var(--dsw-alias-bg-layer-2)',
+        color: 'var(--dsw-alias-label-secondary)',
+        fontSize: 11,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      },
       errorText: {
-        color: 'var(--dsw-alias-state-error-primary, #f87171)',
+        color: 'var(--dsw-alias-state-error-primary)',
         wordBreak: 'break-word',
         marginBottom: 8,
-        maxHeight: 120,
+        maxHeight: 132,
         overflowY: 'auto',
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+        fontSize: 11,
+        lineHeight: 1.5,
       },
-      actions: { display: 'flex', gap: 6, flexWrap: 'wrap' },
+      actions: { display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginTop: 8 },
       button: {
-        border: '1px solid var(--dsw-alias-border-l1, #374151)',
-        background: 'var(--dsw-alias-bg-layer-2, #1f2937)',
-        color: 'var(--dsw-alias-label-primary, #f9fafb)',
-        borderRadius: 8,
-        padding: '4px 10px',
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: 'var(--dsw-alias-bg-layer-2)',
+        color: 'var(--dsw-alias-label-primary)',
+        borderRadius: 9,
+        padding: '6px 12px',
         cursor: 'pointer',
         fontSize: 12,
+        lineHeight: 1.2,
+      },
+      ghost: {
+        border: '1px solid transparent',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-secondary)',
+        borderRadius: 9,
+        padding: '6px 10px',
+        cursor: 'pointer',
+        fontSize: 12,
+        lineHeight: 1.2,
       },
       primary: {
-        border: '1px solid var(--dsw-alias-brand-primary, #3b82f6)',
-        background: 'var(--dsw-alias-brand-primary, #3b82f6)',
+        border: '1px solid var(--dsw-alias-brand-primary)',
+        background: 'var(--dsw-alias-brand-primary)',
         color: '#fff',
-        borderRadius: 8,
-        padding: '4px 10px',
+        borderRadius: 9,
+        padding: '6px 14px',
         cursor: 'pointer',
         fontSize: 12,
+        fontWeight: 600,
+        lineHeight: 1.2,
       },
       modalBackdrop: {
         position: 'fixed',
@@ -354,75 +392,201 @@ window.__ModuleLoader__.load({
         alignItems: 'center',
         justifyContent: 'center',
         /* Bottom padding keeps the modal clear of the corner column
-           (pill + toasts), which is where the last round of overlap came from. */
+           (pill + toasts), which is where the earlier overlap came from. */
         padding: '40px 16px 132px',
         boxSizing: 'border-box',
         pointerEvents: 'auto',
         zIndex: 9998,
+        animation: 'attn-fade 120ms ease-out',
       },
+      modalBackdropNarrow: { alignItems: 'flex-end', padding: '0' },
       modal: {
-        width: 'min(580px, calc(100vw - 32px))',
-        maxHeight: 'calc(100vh - 200px)',
+        width: 'min(620px, calc(100vw - 32px))',
+        maxHeight: 'calc(100vh - 180px)',
         display: 'flex',
         flexDirection: 'column',
-        padding: 16,
+        padding: 0,
+        overflow: 'hidden',
         borderRadius: 16,
-        border: '1px solid var(--dsw-alias-border-l1, #374151)',
-        background: 'var(--dsw-alias-bg-overlay, #111827)',
-        color: 'var(--dsw-alias-label-primary, #f9fafb)',
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: 'var(--dsw-alias-bg-overlay)',
+        color: 'var(--dsw-alias-label-primary)',
         boxShadow: '0 24px 60px rgba(0,0,0,.45)',
-        fontSize: 12,
+        fontSize: 13,
+        outline: 'none',
       },
-      modalHeader: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 },
-      modalBody: { overflowY: 'auto', minHeight: 0, paddingRight: 4 },
-      question: { marginBottom: 12 },
-      questionText: { fontWeight: 600, marginBottom: 4 },
+      modalSheet: { width: '100%', maxWidth: '100vw', maxHeight: '88vh', borderRadius: '16px 16px 0 0' },
+      modalHeader: { display: 'flex', alignItems: 'center', gap: 10, padding: '14px 18px 10px' },
+      headerMain: { display: 'flex', alignItems: 'baseline', gap: 8, flex: 1, minWidth: 0, flexWrap: 'wrap' },
+      headerTools: { display: 'flex', alignItems: 'center', gap: 6, flex: '0 0 auto' },
+      countdownTrack: {
+        height: 3,
+        margin: '0 18px',
+        borderRadius: 3,
+        background: 'var(--dsw-alias-bg-layer-2)',
+        overflow: 'hidden',
+      },
+      countdownFill: {
+        height: '100%',
+        borderRadius: 3,
+        background: 'var(--dsw-alias-state-warn-primary)',
+        transition: 'width 400ms linear',
+      },
+      modalBody: { overflowY: 'auto', minHeight: 0, padding: '12px 18px 14px' },
+      question: { marginBottom: 16 },
+      questionHead: { display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 2 },
+      qIndex: {
+        flex: '0 0 auto',
+        width: 20,
+        height: 20,
+        marginTop: 1,
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 6,
+        background: 'var(--dsw-alias-bg-layer-2)',
+        color: 'var(--dsw-alias-label-secondary)',
+        fontSize: 10,
+        fontWeight: 600,
+        fontVariantNumeric: 'tabular-nums',
+      },
+      questionText: { fontWeight: 600, fontSize: 14, lineHeight: 1.5, margin: 0 },
+      optionsList: { display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8, marginLeft: 28 },
       option: {
-        display: 'block',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
         width: '100%',
         textAlign: 'left',
-        marginBottom: 4,
-        padding: '5px 8px',
-        borderRadius: 7,
-        border: '1px solid var(--dsw-alias-border-l1, #374151)',
-        background: 'var(--dsw-alias-bg-layer-1, #111827)',
-        color: 'var(--dsw-alias-label-primary, #f9fafb)',
+        padding: '8px 12px',
+        minHeight: 36,
+        boxSizing: 'border-box',
+        borderRadius: 10,
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: 'var(--dsw-alias-bg-layer-1)',
+        color: 'var(--dsw-alias-label-primary)',
         cursor: 'pointer',
-        fontSize: 12,
+        fontSize: 13,
+        lineHeight: 1.4,
       },
       optionSelected: {
-        display: 'block',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 10,
         width: '100%',
         textAlign: 'left',
-        marginBottom: 4,
-        padding: '5px 8px',
-        borderRadius: 7,
-        border: '1px solid var(--dsw-alias-brand-primary, #3b82f6)',
-        background: 'var(--dsw-alias-bg-layer-2, #1f2937)',
-        color: 'var(--dsw-alias-label-primary, #f9fafb)',
+        padding: '8px 12px',
+        minHeight: 36,
+        boxSizing: 'border-box',
+        borderRadius: 10,
+        border: '1px solid var(--dsw-alias-brand-primary)',
+        background: 'var(--dsw-alias-bg-layer-2)',
+        color: 'var(--dsw-alias-label-primary)',
         cursor: 'pointer',
-        fontSize: 12,
+        fontSize: 13,
+        lineHeight: 1.4,
       },
+      tick: {
+        flex: '0 0 auto',
+        width: 16,
+        height: 16,
+        borderRadius: 999,
+        boxSizing: 'border-box',
+        border: '1.5px solid var(--dsw-alias-border-l1)',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+      tickSquare: { borderRadius: 4 },
+      tickOn: { borderColor: 'var(--dsw-alias-brand-primary)', background: 'var(--dsw-alias-brand-primary)' },
+      tickDot: { width: 6, height: 6, borderRadius: 999, background: '#fff' },
       input: {
         width: '100%',
         boxSizing: 'border-box',
-        padding: '5px 8px',
-        borderRadius: 7,
-        border: '1px solid var(--dsw-alias-border-l1, #374151)',
-        background: 'var(--dsw-alias-bg-base, #030712)',
-        color: 'var(--dsw-alias-label-primary, #f9fafb)',
-        fontSize: 12,
-        marginBottom: 6,
+        padding: '8px 12px',
+        borderRadius: 10,
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: 'var(--dsw-alias-bg-base)',
+        color: 'var(--dsw-alias-label-primary)',
+        fontSize: 13,
+        marginTop: 8,
+        marginLeft: 28,
       },
-      notice: { color: 'var(--dsw-alias-state-warn-primary, #f59e0b)', marginTop: 6 },
+      footer: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        marginTop: 12,
+        paddingTop: 10,
+        borderTop: '1px solid var(--dsw-alias-border-l1)',
+      },
+      stepper: { display: 'flex', alignItems: 'center', gap: 4, marginLeft: 'auto' },
+      notice: { color: 'var(--dsw-alias-state-warn-primary)', marginTop: 6 },
+      selectWrap: { position: 'relative', display: 'inline-flex', alignItems: 'center' },
       select: {
-        border: '1px solid var(--dsw-alias-border-l1, #374151)',
-        background: 'var(--dsw-alias-bg-base, #030712)',
-        color: 'var(--dsw-alias-label-primary, #f9fafb)',
-        borderRadius: 7,
-        padding: '3px 6px',
+        appearance: 'none',
+        WebkitAppearance: 'none',
+        border: '1px solid var(--dsw-alias-border-l1)',
+        background: 'var(--dsw-alias-bg-layer-2)',
+        color: 'var(--dsw-alias-label-primary)',
+        borderRadius: 8,
+        padding: '4px 22px 4px 10px',
         fontSize: 11,
+        cursor: 'pointer',
       },
+      selectCaret: {
+        position: 'absolute',
+        right: 8,
+        fontSize: 9,
+        color: 'var(--dsw-alias-label-secondary)',
+        pointerEvents: 'none',
+      },
+      cardHead: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, minWidth: 0 },
+      cardHeadPill: { marginBottom: 0 },
+      cardSession: {
+        color: 'var(--dsw-alias-label-secondary)',
+        fontSize: 11,
+        marginBottom: 8,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      },
+    }
+    const ANIMATION_CSS = [
+      '@keyframes attn-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}',
+      '@keyframes attn-fade{from{opacity:0}to{opacity:1}}',
+      '@media (prefers-reduced-motion: reduce){.attn-anim{animation:none!important}}',
+    ].join('')
+
+    function readNarrow() {
+      try {
+        return Boolean(window.matchMedia && window.matchMedia('(max-width: 640px)').matches)
+      } catch {
+        return false
+      }
+    }
+
+    function copyText(text) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          void navigator.clipboard.writeText(text)
+          return
+        }
+      } catch {
+        /* fall through to the textarea path */
+      }
+      try {
+        const area = document.createElement('textarea')
+        area.value = text
+        area.style.position = 'fixed'
+        area.style.opacity = '0'
+        document.body.appendChild(area)
+        area.select()
+        document.execCommand('copy')
+        document.body.removeChild(area)
+      } catch {
+        /* clipboard is best effort */
+      }
     }
 
     class AttentionBoundary extends React.Component {
@@ -719,44 +883,112 @@ window.__ModuleLoader__.load({
           ? Math.max(0, Math.ceil((lastActivity.current + timeoutMinutes * 60000 - Date.now()) / 60000))
           : 0
 
+      const [narrow, setNarrow] = React.useState(readNarrow)
+      const [pageByKey, setPageByKey] = React.useState({})
+      const modalRef = React.useRef(null)
+
+      React.useEffect(() => {
+        if (typeof window === 'undefined' || !window.matchMedia) return undefined
+        const mq = window.matchMedia('(max-width: 640px)')
+        const sync = () => setNarrow(mq.matches)
+        if (mq.addEventListener) mq.addEventListener('change', sync)
+        else if (mq.addListener) mq.addListener(sync)
+        return () => {
+          if (mq.removeEventListener) mq.removeEventListener('change', sync)
+          else if (mq.removeListener) mq.removeListener(sync)
+        }
+      }, [])
+
+      React.useEffect(() => {
+        if (!showModal || !foreground) return
+        const node = modalRef.current
+        if (node && typeof node.focus === 'function') {
+          try {
+            node.focus({ preventScroll: true })
+          } catch {
+            /* focus is best effort */
+          }
+        }
+      }, [showModal, foreground])
+
+      React.useEffect(() => {
+        if (!showModal) return undefined
+        const onKey = (event) => {
+          try {
+            const tag = (event.target && event.target.tagName) || ''
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+            if (event.key === 'Escape') {
+              event.preventDefault()
+              setPanelDismissed(true)
+              return
+            }
+            const first = questions[0]
+            if (!first) return
+            if (event.key === 'Enter') {
+              event.preventDefault()
+              void submitQuestion(first, false)
+              return
+            }
+            const slot = Number(event.key)
+            if (!Number.isInteger(slot) || slot < 1 || slot > 9) return
+            const asked = first.pending.questions || []
+            const page = Math.min(pageByKey[first.key] || 0, Math.max(0, Math.ceil(asked.length / 3) - 1))
+            const question = asked[page * 3 + (slot - 1)]
+            const option = question && (question.options || [])[slot - 1]
+            if (!option) return
+            event.preventDefault()
+            choose(first, question, option.label)
+          } catch {
+            /* keyboard shortcuts must never break the overlay */
+          }
+        }
+        window.addEventListener('keydown', onKey)
+        return () => window.removeEventListener('keydown', onKey)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+      }, [showModal, questionKeys, pageByKey])
+
       const toastItems = [...items].sort((left, right) => (right.at || 0) - (left.at || 0)).slice(0, 4)
       const toasts = toastItems.map((item) => {
         if (item.kind === 'error') {
+          const detail = item.error.code + ': ' + item.error.message
           return h(
             'div',
-            { key: item.key, style: styles.card },
+            { key: item.key, style: { ...styles.card, ...styles.cardError } },
             h(
               'div',
               { style: styles.titleRow },
+              h('span', { style: styles.cardIcon }, '⛔'),
               h('span', { style: styles.title }, tr('error.title')),
-              h('span', { style: styles.muted }, new Date(item.at).toLocaleTimeString()),
+              h('span', { style: { ...styles.muted, marginLeft: 'auto' } }, new Date(item.at).toLocaleTimeString()),
             ),
-            h('div', { style: styles.session }, item.title),
-            h('div', { style: styles.errorText }, `${item.error.code}: ${item.error.message}`),
+            h('div', { style: styles.cardSession }, item.title),
+            h('div', { style: styles.errorText }, detail),
             h(
               'div',
               { style: styles.actions },
               h('button', { style: styles.primary, onClick: () => { openSession(item.sessionId); dismissItem(item.key) } }, tr('error.open')),
-              h('button', { style: styles.button, disabled: busy[item.key], onClick: () => retry(item) }, busy[item.key] ? tr('error.retry') : tr('error.retry')),
-              h('button', { style: styles.button, onClick: () => dismissItem(item.key) }, tr('error.dismiss')),
+              h('button', { style: styles.button, disabled: busy[item.key], onClick: () => retry(item) }, tr('error.retry')),
+              h('button', { style: styles.ghost, onClick: () => copyText(detail) }, tr('error.copy')),
+              h('button', { style: styles.ghost, onClick: () => dismissItem(item.key) }, tr('error.dismiss')),
             ),
           )
         }
         return h(
           'div',
-          { key: item.key, style: styles.card },
+          { key: item.key, style: { ...styles.card, ...styles.cardDone } },
           h(
             'div',
             { style: styles.titleRow },
+            h('span', { style: styles.cardIcon }, '✓'),
             h('span', { style: styles.title }, tr('done.title')),
-            h('span', { style: styles.muted }, new Date(item.at).toLocaleTimeString()),
+            h('span', { style: { ...styles.muted, marginLeft: 'auto' } }, new Date(item.at).toLocaleTimeString()),
           ),
-          h('div', { style: styles.session }, item.title),
+          h('div', { style: styles.cardSession }, item.title),
           h(
             'div',
             { style: styles.actions },
             h('button', { style: styles.primary, onClick: () => { openSession(item.sessionId); dismissItem(item.key) } }, tr('done.open')),
-            h('button', { style: styles.button, onClick: () => dismissItem(item.key) }, tr('done.dismiss')),
+            h('button', { style: styles.ghost, onClick: () => dismissItem(item.key) }, tr('done.dismiss')),
           ),
         )
       })
@@ -770,18 +1002,16 @@ window.__ModuleLoader__.load({
       const autoCards = autoLog.map((entry) =>
         h(
           'div',
-          {
-            key: `autolog:${entry.key}:${entry.at}`,
-            style: { ...styles.card, borderColor: 'var(--dsw-alias-state-warn-primary, #f59e0b)' },
-          },
+          { key: 'autolog:' + entry.key + ':' + entry.at, style: { ...styles.card, ...styles.cardAuto } },
           h(
             'div',
             { style: styles.titleRow },
+            h('span', { style: styles.cardIcon }, '⏱'),
             h('span', { style: styles.title }, tr('question.auto.toast', { title: entry.title })),
-            h('span', { style: styles.muted }, new Date(entry.at).toLocaleTimeString()),
+            h('span', { style: { ...styles.muted, marginLeft: 'auto' } }, new Date(entry.at).toLocaleTimeString()),
           ),
           entry.picks.map((pick, index) =>
-            h('div', { key: index, style: styles.pick }, `${tr('question.auto.picked', { answer: pick.a })}　${pick.q}`),
+            h('div', { key: index, style: styles.pick }, tr('question.auto.picked', { answer: pick.a }) + '　' + pick.q),
           ),
           h(
             'div',
@@ -799,124 +1029,196 @@ window.__ModuleLoader__.load({
             ),
             h(
               'button',
-              { style: styles.button, onClick: () => setAutoLog((previous) => previous.filter((item) => item.key !== entry.key)) },
+              { style: styles.ghost, onClick: () => setAutoLog((previous) => previous.filter((item) => item.key !== entry.key)) },
               tr('question.auto.ack'),
             ),
           ),
         ),
       )
 
-      const modal =
-        showModal && foreground
-          ? h(
+      const countdownRatio =
+        timeoutMinutes > 0
+          ? Math.max(0, Math.min(1, (lastActivity.current + timeoutMinutes * 60000 - Date.now()) / (timeoutMinutes * 60000)))
+          : 0
+
+      function questionCard(item) {
+        const pending = item.pending
+        if (pending.kind === 'plan-review') {
+          return h(
+            'div',
+            { key: item.key, style: styles.card },
+            h(
               'div',
-              { style: styles.modalBackdrop, onPointerDown: (event) => { if (event.target === event.currentTarget) setPanelDismissed(true) } },
+              { style: styles.cardHead },
+              h('span', { style: { ...styles.sessionPill, ...styles.cardHeadPill } }, item.title),
+            ),
+            h('div', { style: styles.questionText }, tr('question.plan')),
+            h(
+              'div',
+              { style: styles.actions },
+              h('button', { style: styles.primary, onClick: () => { openSession(item.sessionId); setPanelDismissed(true) } }, tr('question.openSession')),
+              h('button', { style: styles.ghost, onClick: () => setPanelDismissed(true) }, tr('question.later')),
+            ),
+          )
+        }
+        const asked = pending.questions || []
+        const perPage = 3
+        const pages = Math.max(1, Math.ceil(asked.length / perPage))
+        const page = Math.min(pageByKey[item.key] || 0, pages - 1)
+        const shown = asked.slice(page * perPage, page * perPage + perPage)
+        const goto = (next) => setPageByKey((previous) => ({ ...previous, [item.key]: Math.max(0, Math.min(pages - 1, next)) }))
+        return h(
+          'div',
+          { key: item.key, style: styles.card },
+          h(
+            'div',
+            { style: styles.cardHead },
+            h('span', { style: { ...styles.sessionPill, ...styles.cardHeadPill } }, item.title),
+            h('span', { style: styles.muted }, asked.length + ' 题'),
+            pages > 1
+              ? h(
+                  'div',
+                  { style: styles.stepper },
+                  h('button', { style: styles.ghost, disabled: page === 0, onClick: () => goto(page - 1) }, '‹'),
+                  h('span', { style: styles.muted }, page + 1 + ' / ' + pages),
+                  h('button', { style: styles.ghost, disabled: page >= pages - 1, onClick: () => goto(page + 1) }, '›'),
+                )
+              : null,
+          ),
+          shown.map((question, offset) => {
+            const answer = answerFor(item.key, question.id)
+            const index = page * perPage + offset + 1
+            return h(
+              'div',
+              { key: question.id, style: styles.question },
               h(
                 'div',
-                { style: styles.modal, onPointerDown: touch, onKeyDown: touch },
+                { style: styles.questionHead },
+                h('span', { style: styles.qIndex }, 'q' + index),
                 h(
                   'div',
-                  { style: styles.modalHeader },
-                  h('span', { style: styles.title }, tr('question.title')),
-                  h('span', { style: styles.muted }, tr('question.waitingCount', { count: questions.length })),
-                  h('span', { style: { flex: 1 } }),
-                  h(
-                    'select',
-                    {
-                      style: styles.select,
-                      value: autoAnswer,
-                      title: timeoutMinutes > 0 ? tr('question.auto.hint', { count: timeoutMinutes }) : tr('question.auto.offHint'),
-                      onChange: (event) => setAutoAnswer(event.target.value),
-                    },
-                    h('option', { value: 'off' }, tr('question.auto.off')),
-                    AUTO_OPTIONS.map((minutes) =>
-                      h('option', { key: minutes, value: minutes }, tr('question.auto.minutes', { count: Number(minutes) })),
-                    ),
-                  ),
-                  h('button', { style: styles.button, onClick: () => setPanelDismissed(true) }, tr('question.close')),
-                ),
-                h('div', { style: styles.modalBody }, questions.map((item) => {
-                  const pending = item.pending
-                  const isPlan = pending.kind === 'plan-review'
-                  if (isPlan) {
-                    return h(
-                      'div',
-                      { key: item.key, style: styles.card },
-                      h('div', { style: styles.titleRow }, h('span', { style: styles.title }, tr('question.plan'))),
-                      h('div', { style: styles.session }, item.title),
-                      h(
-                        'div',
-                        { style: styles.actions },
-                        h('button', { style: styles.primary, onClick: () => { openSession(item.sessionId); setPanelDismissed(true) } }, tr('question.openSession')),
-                        h('button', { style: styles.button, onClick: () => setPanelDismissed(true) }, tr('question.later')),
-                      ),
-                    )
-                  }
-                  return h(
-                    'div',
-                    { key: item.key, style: styles.card },
-                    h('div', { style: styles.titleRow }, h('span', { style: styles.title }, item.title)),
-                    (pending.questions || []).map((question) => {
-                      const answer = answerFor(item.key, question.id)
-                      return h(
-                        'div',
-                        { key: question.id, style: styles.question },
-                        question.header ? h('div', { style: styles.muted }, question.header) : null,
-                        h('div', { style: styles.questionText }, `${question.question}${question.multiSelect ? `（${tr('question.multiHint')}）` : ''}`),
-                        (question.options || []).map((option) =>
-                          h(
-                            'button',
-                            {
-                              key: option.label,
-                              style: answer.selected.includes(option.label) ? styles.optionSelected : styles.option,
-                              title: option.description || '',
-                              onClick: () => choose(item, question, option.label),
-                            },
-                            option.label,
-                          ),
-                        ),
-                        h('input', {
-                          style: styles.input,
-                          value: answer.custom,
-                          placeholder: tr('question.custom'),
-                          onChange: (event) => typeCustom(item, question, event.target.value),
-                        }),
-                      )
-                    }),
-                    h(
-                      'div',
-                      { style: styles.actions },
-                      h('button', { style: styles.primary, disabled: busy[item.key], onClick: () => submitQuestion(item, false) }, busy[item.key] ? tr('question.submitting') : tr('question.submit')),
-                      h('button', { style: styles.button, onClick: () => { openSession(item.sessionId); setPanelDismissed(true) } }, tr('question.openSession')),
-                    ),
-                  )
-                })),
-                h(
-                  'div',
-                  { style: { ...styles.muted, marginTop: 8 } },
-                  timeoutMinutes > 0
-                    ? `${tr('question.auto.hint', { count: timeoutMinutes })}（剩余约 ${remainingMinutes} 分钟）　${tr('question.auto.seenOnly')}`
-                    : tr('question.auto.offHint'),
+                  { style: styles.questionText },
+                  question.question + (question.multiSelect ? '（' + tr('question.multiHint') + '）' : ''),
                 ),
               ),
+              question.header ? h('div', { style: { ...styles.muted, marginBottom: 2, marginLeft: 28 } }, question.header) : null,
+              h(
+                'div',
+                { style: styles.optionsList },
+                (question.options || []).map((option) => {
+                  const active = answer.selected.includes(option.label)
+                  return h(
+                    'button',
+                    {
+                      key: option.label,
+                      type: 'button',
+                      role: question.multiSelect ? 'checkbox' : 'radio',
+                      'aria-checked': active ? 'true' : 'false',
+                      title: option.description || '',
+                      style: active ? styles.optionSelected : styles.option,
+                      onClick: () => choose(item, question, option.label),
+                    },
+                    h(
+                      'span',
+                      { style: { ...styles.tick, ...(question.multiSelect ? styles.tickSquare : null), ...(active ? styles.tickOn : null) } },
+                      active ? h('span', { style: styles.tickDot }) : null,
+                    ),
+                    h('span', null, option.label),
+                  )
+                }),
+              ),
+              h('input', {
+                style: styles.input,
+                value: answer.custom,
+                placeholder: tr('question.custom'),
+                'aria-label': tr('question.custom'),
+                onChange: (event) => typeCustom(item, question, event.target.value),
+              }),
             )
-          : null
+          }),
+          h(
+            'div',
+            { style: styles.footer },
+            h(
+              'button',
+              { style: styles.primary, disabled: busy[item.key], onClick: () => submitQuestion(item, false) },
+              busy[item.key] ? tr('question.submitting') : tr('question.submit'),
+            ),
+            h('button', { style: styles.ghost, onClick: () => { openSession(item.sessionId); setPanelDismissed(true) } }, tr('question.openSession')),
+          ),
+        )
+      }
+
+      const notifications = []
+        .concat(autoCards)
+        .concat(notice ? [h('div', { key: 'notice', style: styles.card }, h('div', { style: styles.notice }, notice))] : [])
+        .concat(visibleToasts)
+
+      const modal = showModal && foreground
+        ? h(
+            'div',
+            {
+              style: { ...styles.modalBackdrop, ...(narrow ? styles.modalBackdropNarrow : null) },
+              onPointerDown: (event) => { if (event.target === event.currentTarget) setPanelDismissed(true) },
+            },
+            h(
+              'div',
+              {
+                style: { ...styles.modal, ...(narrow ? styles.modalSheet : null) },
+                role: 'dialog',
+                'aria-modal': 'true',
+                'aria-label': tr('question.title'),
+                tabIndex: -1,
+                ref: modalRef,
+              },
+              h(
+                'div',
+                { style: styles.modalHeader },
+                h(
+                  'div',
+                  { style: styles.headerMain },
+                  h('span', { style: styles.title }, tr('question.title')),
+                  h('span', { style: styles.muted }, tr('question.waitingCount', { count: questions.length })),
+                ),
+                h(
+                  'div',
+                  { style: styles.headerTools },
+                  h(
+                    'span',
+                    { style: styles.selectWrap, title: timeoutMinutes > 0 ? tr('question.auto.hint', { count: timeoutMinutes }) : tr('question.auto.offHint') },
+                    h(
+                      'select',
+                      { style: styles.select, value: autoAnswer, onChange: (event) => setAutoAnswer(event.target.value) },
+                      h('option', { value: 'off' }, tr('question.auto.off')),
+                      AUTO_OPTIONS.map((minutes) =>
+                        h('option', { key: minutes, value: minutes }, tr('question.auto.minutes', { count: Number(minutes) })),
+                      ),
+                    ),
+                    h('span', { style: styles.selectCaret }, '▾'),
+                  ),
+                  h('button', { style: styles.ghost, 'aria-label': tr('question.close'), title: tr('question.close'), onClick: () => setPanelDismissed(true) }, '✕'),
+                ),
+              ),
+              timeoutMinutes > 0
+                ? h(
+                    'div',
+                    { style: styles.countdownTrack, 'aria-hidden': 'true' },
+                    h('div', { style: { ...styles.countdownFill, width: countdownRatio * 100 + '%' } }),
+                  )
+                : null,
+              h('div', { style: styles.modalBody }, questions.map((item) => questionCard(item))),
+            ),
+          )
+        : null
 
       return h(
         'div',
         { style: styles.layer, 'aria-live': 'polite' },
+        h('style', { key: 'attn-css' }, ANIMATION_CSS),
         h(
           'div',
           { style: styles.corner },
-          toastItems.length > 0 || autoCards.length > 0 || notice
-            ? h(
-                'div',
-                { style: styles.toastStack },
-                autoCards,
-                notice ? h('div', { style: styles.card }, h('div', { style: styles.notice }, notice)) : null,
-                visibleToasts,
-              )
-            : null,
+          notifications.length > 0 ? h('div', { style: styles.toastStack }, notifications) : null,
           expanded && questions.length === 0
             ? h(
                 'div',
@@ -927,7 +1229,7 @@ window.__ModuleLoader__.load({
                       h(
                         'button',
                         { key: summary.id, style: styles.row, title: summary.displayTitle, onClick: () => openSession(summary.id) },
-                        `● ${summary.displayTitle}`,
+                        '● ' + summary.displayTitle,
                       ),
                     ),
               )
