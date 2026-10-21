@@ -4,7 +4,119 @@ window.__ModuleLoader__.load({
     const React = require('react')
     const h = React.createElement
 
-    const NS = 'attention'
+    
+/* ---- pending drafts (written by dsh-draft-keepalive) --------------------- */
+const DRAFT_DB = 'dsh-draft-keepalive'
+const DRAFT_LS_PREFIX = 'dsh-draft-keepalive:'
+const DRAFT_STORE = 'state'
+
+function draftFromLocalStorage() {
+  const rows = []
+  try {
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i)
+      if (typeof key !== 'string' || !key.startsWith(DRAFT_LS_PREFIX + 'state:')) continue
+      const raw = localStorage.getItem(key)
+      if (raw === null) continue
+      const value = JSON.parse(raw)
+      if (value && typeof value === 'object') rows.push({ ...value, sessionId: value.sessionId || key.slice(DRAFT_LS_PREFIX.length + 6) })
+    }
+  } catch {}
+  return rows
+}
+
+/** Read pending draft records without creating the database (never owns the schema). */
+async function readDraftRows() {
+  const lsRows = draftFromLocalStorage()
+  if (typeof indexedDB === 'undefined') return lsRows
+  let exists = false
+  try {
+    if (typeof indexedDB.databases === 'function') {
+      const list = await indexedDB.databases()
+      exists = (list || []).some((entry) => entry && entry.name === DRAFT_DB)
+    } else {
+      exists = true
+    }
+  } catch {
+    exists = false
+  }
+  if (!exists) return lsRows
+  const idbRows = await new Promise((resolve) => {
+    try {
+      const request = indexedDB.open(DRAFT_DB)
+      request.onupgradeneeded = () => {
+        try {
+          request.transaction.abort()
+        } catch {}
+      }
+      request.onerror = () => resolve([])
+      request.onsuccess = () => {
+        const db = request.result
+        if (!db.objectStoreNames.contains(DRAFT_STORE)) {
+          db.close()
+          resolve([])
+          return
+        }
+        try {
+          const tx = db.transaction(DRAFT_STORE, 'readonly')
+          const store = tx.objectStore(DRAFT_STORE)
+          const keys = store.getAllKeys()
+          const values = store.getAll()
+          tx.oncomplete = () => {
+            const list = Array.isArray(values.result) ? values.result : []
+            const ids = Array.isArray(keys.result) ? keys.result : []
+            db.close()
+            resolve(list.map((value, index) => ({ ...value, sessionId: (value && value.sessionId) || String(ids[index] || '') })))
+          }
+          tx.onerror = () => {
+            db.close()
+            resolve([])
+          }
+        } catch {
+          db.close()
+          resolve([])
+        }
+      }
+    } catch {
+      resolve([])
+    }
+  })
+  const merged = new Map()
+  for (const row of [...idbRows, ...lsRows]) {
+    if (row && row.sessionId) merged.set(row.sessionId, { ...merged.get(row.sessionId), ...row })
+  }
+  return [...merged.values()]
+}
+
+function draftPending(rows) {
+  return (rows || [])
+    .filter((row) => row && typeof row === 'object')
+    .filter((row) => (row.attachments || []).length > 0 || (row.voice || []).length > 0 || (typeof row.text === 'string' && row.text.trim() !== ''))
+    .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
+}
+
+function draftHeading(row) {
+  const label = typeof row.label === 'string' ? row.label.trim() : ''
+  if (label !== '') return label.slice(0, 30)
+  const voice = (row.voice || [])[0]
+  if (voice && typeof voice.text === 'string' && voice.text.trim() !== '') return voice.text.trim().slice(0, 30)
+  const file = (row.attachments || [])[0]
+  if (file && typeof file.name === 'string' && file.name !== '') return file.name.slice(0, 30)
+  return String(row.sessionId || '').slice(0, 8)
+}
+
+function draftBadges(row) {
+  const parts = []
+  const images = (row.attachments || []).length
+  const voices = (row.voice || []).length
+  const chars = typeof row.text === 'string' ? row.text.trim().length : 0
+  if (images > 0) parts.push('图 ' + images)
+  if (voices > 0) parts.push('语 ' + voices)
+  if (chars > 0) parts.push('字 ' + chars)
+  return parts.join(' · ')
+}
+
+const NS = 'attention'
     const DISMISS_KEY = 'dsh.attention.dismissed.v1'
     const MUTE_KEY = 'dsh.attention.muted.v1'
     const AUTO_KEY = 'dsh.attention.auto.v1'
@@ -21,6 +133,8 @@ window.__ModuleLoader__.load({
         'pill.waiting': 'Answer {count}',
         'pill.failed': 'Failed {count}',
         'pill.done': 'Done {count}',
+'pill.drafts': 'Unsent {count}',
+'pill.draftsEmpty': 'Nothing unsent.',
         'pill.title': 'Attention center',
         'pill.mute': 'Mute alerts',
         'pill.unmute': 'Unmute alerts',
@@ -62,6 +176,8 @@ window.__ModuleLoader__.load({
         'pill.waiting': '待答 {count}',
         'pill.failed': '失败 {count}',
         'pill.done': '完成 {count}',
+        'pill.drafts': '待发送 {count}',
+        'pill.draftsEmpty': '没有待发送的内容。',
         'pill.title': '注意力中心',
         'pill.mute': '静音提醒',
         'pill.unmute': '开启提醒声音',
@@ -679,6 +795,21 @@ window.__ModuleLoader__.load({
       const [muted, setMuted] = React.useState(loadMuted)
       const [autoAnswer, setAutoAnswer] = React.useState(loadAutoAnswer)
       const [expanded, setExpanded] = React.useState(false)
+const [draftRows, setDraftRows] = React.useState([])
+React.useEffect(() => {
+  let alive = true
+  const tick = () => {
+    readDraftRows().then((rows) => {
+      if (alive) setDraftRows(draftPending(rows))
+    }, () => {})
+  }
+  tick()
+  const timer = setInterval(tick, 2000)
+  return () => {
+    alive = false
+    clearInterval(timer)
+  }
+}, [])
       const [drafts, setDrafts] = React.useState({})
       const [busy, setBusy] = React.useState({})
       const [notice, setNotice] = React.useState(null)
@@ -1231,6 +1362,20 @@ window.__ModuleLoader__.load({
           'div',
           { style: styles.corner },
           notifications.length > 0 ? h('div', { style: styles.toastStack }, notifications) : null,
+          expanded && questions.length === 0 && draftRows.length > 0
+          ? h(
+          'div',
+          { style: styles.runningList, 'data-drafts': '1' },
+          h('div', { style: { ...styles.muted, marginBottom: 4 } }, tr('pill.drafts', { count: draftRows.length })),
+          draftRows.slice(0, 8).map((row) =>
+          h(
+          'button',
+          { key: 'draft-' + row.sessionId, style: styles.row, title: draftHeading(row) + ' · ' + draftBadges(row), onClick: () => openSession(row.sessionId) },
+          '✎ ' + draftHeading(row) + '  ' + draftBadges(row),
+          ),
+          ),
+          )
+          : null,
           expanded && questions.length === 0
             ? h(
                 'div',
@@ -1266,6 +1411,7 @@ window.__ModuleLoader__.load({
               : null,
             failed > 0 ? h('span', { style: styles.badgeError }, tr('pill.failed', { count: failed })) : null,
             done > 0 ? h('span', { style: styles.badgeDone }, tr('pill.done', { count: done })) : null,
+draftRows.length > 0 ? h('span', { style: styles.badgeWaiting, title: tr('pill.drafts', { count: draftRows.length }) }, tr('pill.drafts', { count: draftRows.length })) : null,
             h(
               'button',
               {
