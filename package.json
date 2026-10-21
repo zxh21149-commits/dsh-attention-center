@@ -1,6 +1,6 @@
 {
   "name": "dsh-attention-center",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "type": "module",
   "description": "PTC 增强套件（注意力中心 + 刨根问底）：跑在 run_code/SDK 上的 PTC 预设、跨会话答题与失败提醒、与 dsh-ops 取证工具对齐。PTC suite for DeepSeek Harness: inquiry preset on run_code, attention center, ops pairing.",
   "main": "./index.js",

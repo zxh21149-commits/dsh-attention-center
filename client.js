@@ -509,6 +509,10 @@ window.__ModuleLoader__.load({
         background: 'var(--dsw-alias-bg-base)',
         color: 'var(--dsw-alias-label-primary)',
         fontSize: 13,
+      },
+      /* 2026-10-21 dsh-draft-keepalive：缩进/上间距挪到包裹层，麦克风以输入框自身为定位基准。 */
+      inputWrap: {
+        position: 'relative',
         marginTop: 8,
         marginLeft: 28,
       },
@@ -1127,13 +1131,21 @@ window.__ModuleLoader__.load({
                   )
                 }),
               ),
-              h('input', {
-                style: styles.input,
-                value: answer.custom,
-                placeholder: tr('question.custom'),
-                'aria-label': tr('question.custom'),
-                onChange: (event) => typeCustom(item, question, event.target.value),
-              }),
+              h(
+                'div',
+                { style: styles.inputWrap },
+                h('input', {
+                  style: { ...styles.input, paddingRight: 40 },
+                  value: answer.custom,
+                  placeholder: tr('question.custom'),
+                  'aria-label': tr('question.custom'),
+                  /* 2026-10-21 dsh-draft-keepalive：给这个答案框挂麦克风。
+                     插件扫 [data-ka-answer]，把识别结果追加进来并触发 input 事件；
+                     React 受控输入照常走 onChange，不自动提交。 */
+                  'data-ka-answer': '1',
+                  onChange: (event) => typeCustom(item, question, event.target.value),
+                }),
+              ),
             )
           }),
           h(
