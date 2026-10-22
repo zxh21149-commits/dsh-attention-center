@@ -88,6 +88,27 @@ async function readDraftRows() {
   return [...merged.values()]
 }
 
+/** Errors where pressing Retry just replays the same bad request. */
+function isPermanentFailure(code, message) {
+  const text = String(code || '') + ' ' + String(message || '')
+  if (/too many images/i.test(text)) return 'tooManyImages'
+  if (/invalid_request|INVALID_REQUEST/i.test(text)) return 'invalidRequest'
+  if (/\b40[0-4]\b/.test(text)) return 'clientError'
+  return ''
+}
+
+/** Human sentence for a permanent failure, so the card explains instead of nagging. */
+function permanentHint(kind, message) {
+  const text = String(message || '')
+  if (kind === 'tooManyImages') {
+    const match = text.match(/too many images in request:\s*(\d+)\s*>\s*(\d+)/i)
+    if (match) return '这条对话累计 ' + match[1] + ' 张图，上限 ' + match[2] + ' —— 重试不会变，请新开对话或先删掉一些图片。'
+    return '这条对话里的图片超过了上限 —— 重试不会变，请新开对话或先删掉一些图片。'
+  }
+  if (kind === 'invalidRequest') return '请求本身被拒绝（400）—— 原样重试不会变，需要先改内容或新开对话。'
+  return '这类错误重试通常无效 —— 先打开会话看具体原因。'
+}
+
 function draftPending(rows) {
   return (rows || [])
     .filter((row) => row && typeof row === 'object')
@@ -103,6 +124,16 @@ function draftHeading(row) {
   const file = (row.attachments || [])[0]
   if (file && typeof file.name === 'string' && file.name !== '') return file.name.slice(0, 30)
   return String(row.sessionId || '').slice(0, 8)
+}
+
+/** Ask dsh-draft-keepalive to put this conversation's pending content back. */
+function triggerRestore(sessionId) {
+  try {
+    const bridge = typeof window !== 'undefined' ? window.__DSH_DRAFT_KEEPALIVE__ : undefined
+    if (bridge && typeof bridge.restorePending === 'function') {
+      Promise.resolve(bridge.restorePending(sessionId)).catch(() => {})
+    }
+  } catch {}
 }
 
 function draftBadges(row) {
@@ -768,7 +799,7 @@ const NS = 'attention'
     }
 
     function Overlay(props) {
-      const { listStore, statusStore, tr: translate, openSession, retrySession } = props
+      const { listStore, statusStore, tr: translate, openSession, retrySession, occupancyOf } = props
       const tr = (key, params) => {
         try {
           return typeof translate === 'function' ? translate(key, params) : key
@@ -1085,6 +1116,7 @@ React.useEffect(() => {
       const toastItems = [...items].sort((left, right) => (right.at || 0) - (left.at || 0)).slice(0, 4)
       const toasts = toastItems.map((item) => {
         if (item.kind === 'error') {
+          const permanent = isPermanentFailure(item.error.code, item.error.message)
           const detail = item.error.code + ': ' + item.error.message
           return h(
             'div',
@@ -1102,7 +1134,7 @@ React.useEffect(() => {
               'div',
               { style: styles.actions },
               h('button', { style: styles.primary, onClick: () => { openSession(item.sessionId); dismissItem(item.key) } }, tr('error.open')),
-              h('button', { style: styles.button, disabled: busy[item.key], onClick: () => retry(item) }, tr('error.retry')),
+              permanent ? null : h('button', { style: styles.button, disabled: busy[item.key], onClick: () => retry(item) }, tr('error.retry')),
               h('button', { style: styles.ghost, onClick: () => copyText(detail) }, tr('error.copy')),
               h('button', { style: styles.ghost, onClick: () => dismissItem(item.key) }, tr('error.dismiss')),
             ),
@@ -1370,7 +1402,7 @@ React.useEffect(() => {
           draftRows.slice(0, 8).map((row) =>
           h(
           'button',
-          { key: 'draft-' + row.sessionId, style: styles.row, title: draftHeading(row) + ' · ' + draftBadges(row), onClick: () => openSession(row.sessionId) },
+          { key: 'draft-' + row.sessionId, style: styles.row, title: draftHeading(row) + ' · ' + draftBadges(row), onClick: () => { triggerRestore(row.sessionId); openSession(row.sessionId) } },
           '✎ ' + draftHeading(row) + '  ' + draftBadges(row),
           ),
           ),
@@ -1386,7 +1418,7 @@ React.useEffect(() => {
                       h(
                         'button',
                         { key: summary.id, style: styles.row, title: summary.displayTitle, onClick: () => openSession(summary.id) },
-                        '● ' + summary.displayTitle,
+                        '● ' + summary.displayTitle + (occupancyOf && occupancyOf(summary.id) ? '  · 上下文 ' + occupancyOf(summary.id).percent + '%' : ''),
                       ),
                     ),
               )
@@ -1411,7 +1443,17 @@ React.useEffect(() => {
               : null,
             failed > 0 ? h('span', { style: styles.badgeError }, tr('pill.failed', { count: failed })) : null,
             done > 0 ? h('span', { style: styles.badgeDone }, tr('pill.done', { count: done })) : null,
-draftRows.length > 0 ? h('span', { style: styles.badgeWaiting, title: tr('pill.drafts', { count: draftRows.length }) }, tr('pill.drafts', { count: draftRows.length })) : null,
+draftRows.length > 0
+? h('button', {
+    key: 'draft-badge',
+    style: { ...styles.badgeWaiting, border: 'none', cursor: 'pointer', font: 'inherit' },
+    title: tr('pill.drafts', { count: draftRows.length }),
+    onClick: () => {
+      if (draftRows.length === 1) { triggerRestore(draftRows[0].sessionId); openSession(draftRows[0].sessionId) }
+      else setExpanded(true)
+    },
+  }, tr('pill.drafts', { count: draftRows.length }))
+: null,
             h(
               'button',
               {
@@ -1459,6 +1501,26 @@ draftRows.length > 0 ? h('span', { style: styles.badgeWaiting, title: tr('pill.d
         })()
       }
 
+      /* Context occupancy, read from the same projection the composer meter uses. */
+      const occupancyOf = (sessionId) => {
+        try {
+          const binding = ctx.sessions.binding(sessionId)
+          const session = binding && binding.session
+          const projections = session && session.projections
+          if (!projections) return null
+          const pressure = projections.faceOf('contextPressure').getSnapshot()
+          const used = pressure && (pressure.projectedTokens ?? pressure.pressureTokens)
+          if (used === undefined || pressure.contextWindow === undefined) return null
+          return {
+            percent: Math.min(100, Math.round((used / pressure.contextWindow) * 100)),
+            used,
+            window: pressure.contextWindow,
+          }
+        } catch {
+          return null
+        }
+      }
+
       const Component = (props) =>
         h(
           AttentionBoundary,
@@ -1469,6 +1531,7 @@ draftRows.length > 0 ? h('span', { style: styles.badgeWaiting, title: tr('pill.d
             statusStore: props.statusStore || statusStore,
             tr,
             openSession: (sessionId) => ctx.uiWorkspace.openSession(sessionId),
+            occupancyOf,
             retrySession,
           }),
         )
